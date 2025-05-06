@@ -17,6 +17,12 @@
 </body>
 <script>
     document.getElementById("btn-download").addEventListener("click", (e) => {
+        firstCycleValue = document.getElementById("1st").value;
+        secondCycleValue = document.getElementById("2nd").value;
+        tempoValue = document.getElementById("tempo").value;
+        comboValue = document.getElementById("combo").value;
+        boardstateValue = document.getElementById("boardstate").value;
+        flexValue = document.getElementById("flex").value;
         var canvas = document.getElementById("hexagon");
         var dataUrl = canvas.toDataURL("image/png", 1.0);
         downloadImage(dataUrl, "power_ranking.png");
@@ -31,18 +37,23 @@
     }
 
     addEventListener("change", (event) => {
-        console.log("Are they rerunning?")
+        firstCycleValue = document.getElementById("1st").value;
+        secondCycleValue = document.getElementById("2nd").value;
+        tempoValue = document.getElementById("tempo").value;
+        comboValue = document.getElementById("combo").value;
+        boardstateValue = document.getElementById("boardstate").value;
+        flexValue = document.getElementById("flex").value;
         drawPowerRankings()
         renderPowerRankings();
     });
     const ctx = document.getElementById('hexagon').getContext('2d');
 
-    const firstCycleValue = document.getElementById("1st").value;
-    const secondCycleValue = document.getElementById("2nd").value;
-    const tempoValue = document.getElementById("tempo").value;
-    const comboValue = document.getElementById("combo").value;
-    const boardstateValue = document.getElementById("boardstate").value;
-    const flexValue = document.getElementById("flex").value;
+    let firstCycleValue = document.getElementById("1st").value;
+    let secondCycleValue = document.getElementById("2nd").value;
+    let tempoValue = document.getElementById("tempo").value;
+    let comboValue = document.getElementById("combo").value;
+    let boardstateValue = document.getElementById("boardstate").value;
+    let flexValue = document.getElementById("flex").value;
     const points = [];
     const startPoints = [];
     const labels = ["1st Cycle", "2nd+ Cycle", "Tempo", "Combo", "Board State", "Flex"];
@@ -75,7 +86,6 @@
 
                 }
 
-                console.log("size? " + size)
                 if (size === 40) {
                     startPoints.push({
                         x: Xcenter + (240 / 6) * Math.cos(i * 2 * Math.PI / numberOfSides),
