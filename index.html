@@ -1,1 +1,138 @@
-Hello World
+<html>
+
+
+<body>
+    <ul>
+        <li>1st Cycle: <input type="number" min="0" max="100" id="1st" /></li>
+        <li>2nd+ Cycle: <input type="number" min="0" max="100" id="2nd" /></li>
+        <li>Tempo: <input type="number" min="0" max="100" id="tempo" /></li>
+        <li>Combo: <input type="number" min="0" max="100" id="combo" /></li>
+        <li>Board State: <input type="number" min="0" max="100" id="boardstate" /></li>
+        <li>Flex: <input type="number" min="0" max="100" id="flex" /></li>
+    </ul>
+    <canvas id="hexagon" height="800" width="800"></canvas>
+
+    <button id="btn-download">Download</button>
+
+</body>
+<script>
+    document.getElementById("btn-download").addEventListener("click", (e) => {
+        var canvas = document.getElementById("hexagon");
+        var dataUrl = canvas.toDataURL("image/png", 1.0);
+        downloadImage(dataUrl, "power_ranking.png");
+    })
+
+    const downloadImage = (data, filname = "untitled.png") => {
+        var a = document.createElement('a');
+        a.href = data;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+    }
+
+    addEventListener("change", (event) => {
+        console.log("Are they rerunning?")
+        drawPowerRankings()
+        renderPowerRankings();
+    });
+    const ctx = document.getElementById('hexagon').getContext('2d');
+
+    const firstCycleValue = document.getElementById("1st").value;
+    const secondCycleValue = document.getElementById("2nd").value;
+    const tempoValue = document.getElementById("tempo").value;
+    const comboValue = document.getElementById("combo").value;
+    const boardstateValue = document.getElementById("boardstate").value;
+    const flexValue = document.getElementById("flex").value;
+    const points = [];
+    const startPoints = [];
+    const labels = ["1st Cycle", "2nd+ Cycle", "Tempo", "Combo", "Board State", "Flex"];
+
+    const renderPowerRankings = () => {
+        // hexagon
+        var numberOfSides = 6,
+            size = 240,
+            textOffset = 50,
+            Xcenter = 400,
+            Ycenter = 400;
+        ctx.font = "25px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        const drawShape = (sides, size, Xcenter, Ycenter, writeLabel) => {
+            ctx.beginPath();
+            ctx.moveTo(Xcenter + size * Math.cos(0), Ycenter + size * Math.sin(0));
+
+            for (var i = 1; i <= numberOfSides; i += 1) {
+                ctx.lineTo(Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides));
+
+                // Grab the outermost point and add an offset to write text at.
+                if (writeLabel) {
+                    ctx.fillText(labels[i - 1], Xcenter + (size + textOffset) * Math.cos(i * 2 * Math.PI / numberOfSides), Ycenter + (size + textOffset) * Math.sin(i * 2 * Math.PI / numberOfSides))
+
+                    // Store the point without the offset so that we have a point to lerp between.
+                    const x = Xcenter + size * Math.cos(i * 2 * Math.PI / numberOfSides), y = Ycenter + size * Math.sin(i * 2 * Math.PI / numberOfSides)
+                    points.push({ x, y })
+
+                }
+
+                console.log("size? " + size)
+                if (size === 40) {
+                    startPoints.push({
+                        x: Xcenter + (240 / 6) * Math.cos(i * 2 * Math.PI / numberOfSides),
+                        y: Ycenter + (240 / 6) * Math.sin(i * 2 * Math.PI / numberOfSides)
+                    })
+                }
+            }
+
+            ctx.strokeStyle = "#000000";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // ctx.fillText("Test", Xcenter + (size + textOffset) * Math.cos(0), Ycenter + (size + textOffset) * Math.sin(0))
+        }
+
+        const write = (text) => {
+
+            ctx.beginPath()
+            ctx.arc(10, 80, 40, 0, 2 * Math.PI);
+            ctx.stroke();
+        };
+
+        drawShape(numberOfSides, size, Xcenter, Ycenter, true);
+
+        const oneFifth = size / 6;
+        for (var i = size - oneFifth; i > 0; i -= oneFifth) {
+            console.log(`I: ${i}`);
+            drawShape(numberOfSides, i, Xcenter, Ycenter);
+        }
+    }
+
+    const lerp = (start, ending, alpha) => {
+        const l = start + alpha * (ending - start)
+        // Program in a minimum of like 5 to prevent collapsing polygons.
+        console.log(l);
+        return l;
+    }
+
+    const drawPowerRankings = () => {
+        ctx.fillStyle = "rgba(100, 0, 0, 50)";
+        ctx.strokeStyle = "#df4b26";
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+        ctx.lineTo(lerp(startPoints[0].x, points[0].x, firstCycleValue / 100), lerp(startPoints[0].y, points[0].y, firstCycleValue / 100));
+        ctx.lineTo(lerp(startPoints[1].x, points[1].x, secondCycleValue / 100), lerp(startPoints[1].y, points[1].y, secondCycleValue / 100));
+        ctx.lineTo(lerp(startPoints[2].x, points[2].x, tempoValue / 100), lerp(startPoints[2].y, points[2].y, tempoValue / 100));
+        ctx.lineTo(lerp(startPoints[3].x, points[3].x, comboValue / 100), lerp(startPoints[3].y, points[3].y, comboValue / 100));
+        ctx.lineTo(lerp(startPoints[4].x, points[4].x, boardstateValue / 100), lerp(startPoints[4].y, points[4].y, boardstateValue / 100));
+        ctx.lineTo(lerp(startPoints[5].x, points[5].x, flexValue / 100), lerp(startPoints[5].y, points[5].y, flexValue / 100));
+        ctx.closePath();
+        ctx.fill(); // Or ctx.fill(); to fill the circle
+    }
+    // Initial Render
+    // Should be rendering the otherway, but I only iterate through the points in the first one. Oops.
+    renderPowerRankings();
+    drawPowerRankings();
+</script>
+
+</html>
